@@ -1,0 +1,31 @@
+<!doctype html>
+<html>
+  <head>
+    <title>PodcastTime</title>
+    <link
+      rel="stylesheet"
+      href="node_modules/select2/dist/css/select2.min.css"/>
+    <link
+      rel="stylesheet"
+      href="semantic/dist/semantic.min.css"/>
+    <link
+      rel="stylesheet"
+      href="/static/podcasttime.css"/>
+    <link rel="icon" type="image/png" href="/static/favicon-32x32.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="/static/favicon-96x96.png" sizes="96x96">
+    <link rel="icon" type="image/png" href="/static/favicon-16x16.png" sizes="16x16">
+  </head>
+  <body>
+    <div id="root">
+    </div>
+    <!-- select2 isn't ready to be imported with webpack,
+    so I put it in window's global.
+    Inside select2, it requires that jQuery is defined, so we
+    can't easily put jQuery inside the webpack app.
+    -->
+    <script src="node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="node_modules/select2/dist/js/select2.min.js"></script>
+    <script src="/static/bundle.js"></script>
+
+  </body>
+</html>
