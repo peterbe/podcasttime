@@ -33,7 +33,7 @@ function receivePicks(page, json) {
 
 export function fetchPicks(page = 1) {
   return dispatch => {
-    dispatch(requestPicks(page))
+    dispatch(selectPage(page))
     return fetch(`/api/picks/data/?page=${page}`)
       .then(response => response.json())
       .then(json => dispatch(receivePicks(page, json)))

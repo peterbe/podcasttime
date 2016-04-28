@@ -1,10 +1,14 @@
 import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
+import { Link, browserHistory } from 'react-router'
 import {
   selectPage,
   requestPicks,
   fetchPicks,
 } from '../actions/picks'
+// import {
+//   selectPodcastID,
+// } from '../actions/podcasts'
 import { podcastURL, picksURL } from '../utils'
 
 
@@ -19,34 +23,32 @@ class Home extends Component {
   constructor(props) {
     super(props)
     // console.log("CONSTRUCTOR PICKS.HOME", props);
-    console.log("IN constructor", props);
+    // console.log("IN constructor", props);
     this.handlePageChange = this.handlePageChange.bind(this)
   }
 
   componentDidMount() {
     const { dispatch, selectedPage } = this.props
     let page = parseInt(this.props.params.page || "1")
-    console.log('PAGE:', page, 'SELECTEDPAGE', selectedPage);
-    dispatch(selectPage(page))
-    dispatch(fetchPicks(selectedPage))
+    // console.log('PAGE:', page, 'SELECTEDPAGE', selectedPage);
+    // dispatch(selectPage(page))
+    dispatch(fetchPicks(page))
     // dispatch()
   }
 
-  handlePageChange(page) {
-    // this.props.dispatch(selectedPage({page: }))
+  handlePageChange(event, page) {
+    event.preventDefault()
+
+    if (page > 1) {
+      browserHistory.push(`/picks/${page}`)
+    } else {
+      browserHistory.push(`/picks`)
+    }
     this.props.dispatch(fetchPicks(page))
+    // this.props.dispatch(selectPage(page))
   }
-  // console.log('PICKS...');
-  // console.log(picks);
-  // console.log('AFTER3');
-  // XXX Need a solution of not having to repeat the metadata too much
-  // picks.isFetching??
+
   render() {
-    // {
-    //   picks.items.map((pick) => {
-    //     return <Pick pick={pick}/>
-    //   })
-    // }
     const { isFetching, selectedPage, items, pagination } = this.props
     if (isFetching) {
       return (
@@ -57,6 +59,7 @@ class Home extends Component {
     }
     return (
       <div className="ui text container">
+        <h2>Picks - Page {this.props.selectedPage}</h2>
         {
           items.map((pick) => {
             return <Pick key={pick.id} pick={pick}/>
@@ -70,40 +73,9 @@ class Home extends Component {
   }
 }
 
-const Pagination = ({pagination, handlePageChange}) => {
-  return (
-    <div className="ui two column centered grid" style={{marginTop: 100}}>
-      <div className="ui pagination menu">
-        {
-          pagination.has_previous ?
-          <a className="item" href={picksURL(pagination.previous_page_number)}
-            onClick={() => handlePageChange(pagination.previous_page_number)}>
-            &larr; Page {pagination.previous_page_number}
-          </a>
-          :
-          null
-        }
-        <a className="item disabled">
-          Page {pagination.number} of {pagination.num_pages}
-        </a>
-        {
-          pagination.has_next ?
-          <a className="item" href={picksURL(pagination.next_page_number)}
-            onClick={() => handlePageChange(pagination.next_page_number)}>
-            Page {pagination.next_page_number} &rarr;
-          </a>
-          :
-          <a className="item disabled">
-            Page {pagination.num_pages}
-          </a>
-        }
-      </div>
-    </div>
-  )
-}
-Pagination.propTypes = {
-  handlePageChange: PropTypes.func.isRequired,
-  pagination: PropTypes.object.isRequired,
+const Picks = ({picks}) => {
+  return
+
 }
 
 const Pick = ({pick}) => {
@@ -120,11 +92,19 @@ const Pick = ({pick}) => {
 }
 
 const Podcast = ({podcast}) => {
+  const handlePocastClick = (event, podcast) => {
+    event.preventDefault()
+    // selectPodcastID()
+    browserHistory.push(podcastURL(podcast))
+    // console.log(podcastURL(podcast))
+  }
+
   return (
     <div
       className="ui centered card"
       title="{podcast.title}">
-      <a className="image" href={podcastURL(podcast)}>
+      <a className="image" href={podcastURL(podcast)}
+        onClick={(event) => handlePocastClick(event, podcast)}>
         {
           podcast.image ?
           <img src={podcast.image}/> :
@@ -139,11 +119,62 @@ const Podcast = ({podcast}) => {
 }
 
 
+const Pagination = ({pagination, handlePageChange}) => {
+
+  const prev = (page) => {
+    return `← Page ${page}`
+  }
+
+  const next = (page) => {
+    return `Page ${page} →`
+  }
+
+  const current = (number, pages) => {
+    return `Page ${number} or ${pages}`
+  }
+
+  return (
+    <div className="ui two column centered grid" style={{marginTop: 100}}>
+      <div className="ui pagination menu">
+        {
+          pagination.has_previous ?
+          <a className="item" href={picksURL(pagination.previous_page_number)}
+            onClick={(event) => handlePageChange(event, pagination.previous_page_number)}>
+            {prev(pagination.previous_page_number)}
+          </a>
+          :
+          null
+        }
+        <a className="item disabled">
+          {current(pagination.number, pagination.num_pages)}
+        </a>
+        {
+          pagination.has_next ?
+          <a className="item" href={picksURL(pagination.next_page_number)}
+            onClick={(event) => handlePageChange(event, pagination.next_page_number)}>
+            {next(pagination.next_page_number)}
+          </a>
+          :
+          <a className="item disabled">
+            Page{' '}{pagination.num_pages}
+          </a>
+        }
+      </div>
+    </div>
+  )
+}
+Pagination.propTypes = {
+  handlePageChange: PropTypes.func.isRequired,
+  pagination: PropTypes.object.isRequired,
+}
+
+
 function mapStateToProps(state) {
   // const { picksRootReducer } = state
-  console.log("STATATE", state);
+
+  // console.log("STATATE", state);
   const { picksByPage, selectedPage } = state.picksRootReducer
-  console.log('picksRootReducer', state.picksRootReducer);
+  // console.log('IN mapStateToProps picksRootReducer=', state.picksRootReducer);
   const {
     isFetching,
     // lastUpdated,
