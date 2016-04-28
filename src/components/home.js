@@ -1,19 +1,102 @@
-import React, { Component } from 'react';
-// import $ from 'jquery';
+import React from 'react'
+import { connect } from 'react-redux'
+import {
+  addPodcast,
+  removePodcast,
+  removeAllPodcasts,
+} from '../actions/podcasts'
 
-export default class Home extends Component {
-  render() {
-    return (
-      <div className="ui text container">
-        <h1>How Much Time Do <i>Your</i> Podcasts Take To Listen To?</h1>
-        <MainSearch/>
-      </div>
-    );
-  }
+function Home({ podcasts, addPodcast, removePodcast, removeAllPodcasts }) {
+  // console.log('PODCASTS...');
+  // console.log(podcasts);
+  // console.log('AFTER3');
+  return (
+    <div className="ui text container">
+      <h1>How Much Time Do <i>Your</i> Podcasts Take To Listen To?</h1>
+      <MainSearch
+        addPodcast={addPodcast}
+        />
+      <Podcasts
+        podcasts={podcasts}
+        removePodcast={removePodcast}
+        removeAllPodcasts={removeAllPodcasts}
+        />
+    </div>
+  );
 }
 
+const Podcasts = ({podcasts, removePodcast, removeAllPodcasts}) => {
+  // XXX instead of style we should set a classname that'll animate it
+  // in as a fade
+  let style = {};
+  if (podcasts.length) {
+    style.display = 'block';
+  }
+  return (
+    <div className="selected" style={style}>
+      <h3><i>Your</i> Podcasts...</h3>
+      <div className="your-podcasts">
+        {
+          podcasts.map((podcast) => {
+            return <Podcast
+              key={podcast.id}
+              podcast={podcast}
+              removePodcast={() => removePodcast(podcast)}/>
+          })
+        }
+      </div>
+      <div className="remove-all">
+        <button
+          type="button"
+          className="button ui remove-all"
+          title="And start over..."
+          onClick={removeAllPodcasts}>Remove All</button>
+      </div>
+    </div>
+  )
+}
 
-class MainSearch extends Component {
+const Podcast = ({podcast, removePodcast}) => {
+  let text = podcast.episodes + ' episodes';
+  if (podcast.hours !== null) {
+    // XXX template?
+    text += ', about ' + parseInt(podcast.hours, 10) + ' hours';
+  }
+  return (
+    <div className="clearfix podcast">
+      <div className="actions">
+        <button
+          type="button"
+          className="ui button"
+          onClick={removePodcast}
+          >Remove</button>
+      </div>
+      <div className="img">
+        <a title={podcast.name}
+          href={'/podcasts/' + podcast.id + '/' + podcast.slug}
+          ><img src={podcast.image_url} alt="logo"/></a>
+      </div>
+      <div className="meta">
+        <h3>
+          <a title={podcast.name}
+            href={'/podcasts/' + podcast.id + '/' + podcast.slug}
+            >{podcast.name}</a>
+        </h3>
+        <p>
+          { text }
+        </p>
+      </div>
+    </div>
+  )
+}
+
+export default connect(
+  state => ({ podcasts: state.podcasts }),
+  { addPodcast, removePodcast, removeAllPodcasts }
+)(Home)
+
+
+class MainSearch extends React.Component {
 
   formatPodcast(podcast) {
     if (podcast.loading) return podcast.name;
@@ -88,12 +171,8 @@ class MainSearch extends Component {
       templateResult: this.formatPodcast,
       templateSelection: this.formatPodcastSelection,
     })
-    .on("select2:select", function (event) {
-      store.dispatch({
-        type: 'PODCAST',
-        data: event.params.data
-      });
-      // addSelectedPodcast(event.params.data);
+    .on("select2:select", (event) => {
+      this.props.addPodcast(event.params.data);
     });
   }
 

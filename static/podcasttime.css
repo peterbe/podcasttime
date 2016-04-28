@@ -63,6 +63,12 @@ form select {
   border-radius: 30px;
 }
 
+.remove-all {
+  margin-top: 15px;
+  margin-bottom: 50px;
+  float: right;
+}
+
 /* initially hidden to make the first impression clean */
 .link-to-discover {
   float: right;
