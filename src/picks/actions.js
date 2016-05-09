@@ -5,7 +5,7 @@ import {
   RECEIVE_PICKS,
   REQUEST_PICKS,
   SELECT_PICKS_PAGE,
- } from '../constants'
+ } from './constants'
 
 
 export function requestPicks(page = 1) {

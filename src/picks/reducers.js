@@ -3,7 +3,7 @@ import {
   REQUEST_PICKS,
   RECEIVE_PICKS,
   SELECT_PICKS_PAGE,
-} from '../constants'
+} from './constants'
 
 
 function selectedPage(state = 1, action) {
@@ -41,7 +41,6 @@ function getPicks(state = {
 
 function picksByPage(state = { }, action) {
   switch (action.type) {
-    // case INVALIDATE_SUBREDDIT:
     case RECEIVE_PICKS:
     case REQUEST_PICKS:
       return Object.assign({}, state, {

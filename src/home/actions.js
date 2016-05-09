@@ -1,9 +1,8 @@
-// XXX are these constants used anywhere else?!
 import {
   ADD_PODCAST,
   REMOVE_PODCAST,
   REMOVE_ALL_PODCASTS,
- } from '../constants'
+ } from './constants'
 
 
 export function addPodcast(podcast) {

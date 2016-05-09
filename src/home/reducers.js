@@ -2,7 +2,7 @@ import {
   ADD_PODCAST,
   REMOVE_PODCAST,
   REMOVE_ALL_PODCASTS,
-} from '../constants'
+} from './constants'
 
 const initialState = {
   podcasts: []
