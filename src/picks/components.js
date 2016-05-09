@@ -6,9 +6,6 @@ import {
   requestPicks,
   fetchPicks,
 } from '../picks/actions'
-// import {
-//   selectPodcastID,
-// } from '../actions/podcasts'
 import { podcastURL, picksURL } from '../utils'
 
 
@@ -22,25 +19,23 @@ class Home extends Component {
 
   constructor(props) {
     super(props)
-    // console.log("CONSTRUCTOR PICKS.HOME", props);
-    // console.log("IN constructor", props);
     this.handlePageChange = this.handlePageChange.bind(this)
   }
 
-  componentDidMount() {
-    const { dispatch, selectedPage } = this.props
-    let page = parseInt(this.props.params.page || "1")
-    console.log('Here in Picks.Picks.componentDidMount', page);
-    // console.log('PAGE:', page, 'SELECTEDPAGE', selectedPage);
-    // dispatch(selectPage(page))
-    // dispatch(fetchPicks(page))
-    // dispatch()
-  }
+  // componentDidMount() {
+  //   const { dispatch, selectedPage } = this.props
+  //   let page = parseInt(this.props.params.page || "1")
+  //   // console.log('Here in Picks.Picks.componentDidMount', page);
+  //   // console.log('PAGE:', page, 'SELECTEDPAGE', selectedPage);
+  //   // dispatch(selectPage(page))
+  //   // dispatch(fetchPicks(page))
+  //   // dispatch()
+  // }
 
   handlePageChange(event, page) {
     event.preventDefault()
 
-    // Use <Link> instead in the JSX render
+    // XXX Use <Link> instead in the JSX render
     if (page > 1) {
       browserHistory.push(`/picks/${page}`)
     } else {
@@ -74,11 +69,6 @@ class Home extends Component {
     )
   }
 }
-
-// const Picks = ({picks}) => {
-//   return
-//
-// }
 
 const Pick = ({pick}) => {
   // XXX stop using style tags
@@ -172,11 +162,7 @@ Pagination.propTypes = {
 
 
 function mapStateToProps(state) {
-  // const { picksRootReducer } = state
-
-  // console.log("STATATE", state);
-  const { picksByPage, selectedPage } = state.picksRootReducer
-  console.log('IN mapStateToProps picksRootReducer=', state.picksRootReducer);
+  const { picksByPage, selectedPage } = state.picks
   const {
     isFetching,
     // lastUpdated,

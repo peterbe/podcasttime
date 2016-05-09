@@ -14,9 +14,7 @@ import { syncHistoryWithStore, routerReducer } from 'react-router-redux'
 // XXX instead of this combiner, import all of them and list them
 // make calling combineReducers().
 import * as reducers from './reducers'
-// import { App, Home, Picks } from './components'
-// import { App, Home } from './components'
-// import { App } from './components'
+
 import App from './main/app'
 import Home from './home/components'
 import Picks from './picks/components'

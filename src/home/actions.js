@@ -1,26 +1,10 @@
-import { ADD_PODCAST_ID, REMOVE_PODCAST_ID } from '../constants'
-
-export function addPodcastId(id) {
-  return {
-    type: ADD_PODCAST_ID,
-    id: id
-  }
-}
-
-export function removePodcastId(id) {
-  return {
-    type: REMOVE_PODCAST_ID,
-    id: id
-  }
-}
-
-
-
+// XXX are these constants used anywhere else?!
 import {
   ADD_PODCAST,
   REMOVE_PODCAST,
   REMOVE_ALL_PODCASTS,
  } from '../constants'
+
 
 export function addPodcast(podcast) {
   return {
