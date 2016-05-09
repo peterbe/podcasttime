@@ -14,6 +14,7 @@ import { syncHistoryWithStore, routerReducer } from 'react-router-redux'
 import * as reducers from './reducers'
 // import { App, Home, Foo, Bar } from './components'
 import { App, Home, Picks } from './components'
+import { fetchPicks } from './actions/picks'
 
 const loggerMiddleware = createLogger()
 
@@ -37,6 +38,16 @@ const store = createStore(
 )
 
 
+const onEnterPicks = (nextState, replace, callback) => {
+  console.log("in onEnterPicks", nextState, replace);
+  let page = parseInt(nextState.params.page || "1")
+  console.log('Here in onEnterPicks', page);
+  store.dispatch(fetchPicks(page))
+  console.log('Dispatched');
+  callback()
+}
+
+
 const history = syncHistoryWithStore(browserHistory, store)
 
 ReactDOM.render(
@@ -45,9 +56,10 @@ ReactDOM.render(
       <Router history={history}>
         <Route path="/" component={App}>
           <IndexRoute component={Home}/>
-          <Route path="picks" component={Picks}/>
-          <Route path="picks/:page" component={Picks}/>
-          {/*<Route path="bar" component={Bar}/>*/}
+          <Route path="picks" component={Picks}
+            onEnter={onEnterPicks}/>
+          <Route path="picks/:page" component={Picks}
+            onEnter={onEnterPicks}/>
         </Route>
       </Router>
       {/*<DevTools />*/}

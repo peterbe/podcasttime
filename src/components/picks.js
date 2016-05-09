@@ -30,9 +30,10 @@ class Home extends Component {
   componentDidMount() {
     const { dispatch, selectedPage } = this.props
     let page = parseInt(this.props.params.page || "1")
+    console.log('Here in Picks.Home.componentDidMount', page);
     // console.log('PAGE:', page, 'SELECTEDPAGE', selectedPage);
     // dispatch(selectPage(page))
-    dispatch(fetchPicks(page))
+    // dispatch(fetchPicks(page))
     // dispatch()
   }
 
@@ -44,7 +45,7 @@ class Home extends Component {
     } else {
       browserHistory.push(`/picks`)
     }
-    this.props.dispatch(fetchPicks(page))
+    // this.props.dispatch(fetchPicks(page))
     // this.props.dispatch(selectPage(page))
   }
 
@@ -174,7 +175,7 @@ function mapStateToProps(state) {
 
   // console.log("STATATE", state);
   const { picksByPage, selectedPage } = state.picksRootReducer
-  // console.log('IN mapStateToProps picksRootReducer=', state.picksRootReducer);
+  console.log('IN mapStateToProps picksRootReducer=', state.picksRootReducer);
   const {
     isFetching,
     // lastUpdated,
