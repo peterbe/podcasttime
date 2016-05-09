@@ -8,7 +8,7 @@ const initialState = {
   podcasts: []
 }
 
-export default function update(state = initialState.podcasts, action) {
+export default function select(state = initialState.podcasts, action) {
   if (action.type === ADD_PODCAST) {
     return [action.podcast, ...state];
   } else if (action.type === REMOVE_PODCAST) {

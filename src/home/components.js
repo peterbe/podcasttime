@@ -185,6 +185,6 @@ class MainSearch extends React.Component {
 }
 
 export default connect(
-  state => ({ podcasts: state.podcasts }),
+  state => ({ podcasts: state.select }),
   { addPodcast, removePodcast, removeAllPodcasts }
 )(Home)

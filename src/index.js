@@ -11,9 +11,8 @@ import { Provider } from 'react-redux'
 import { Router, Route, IndexRoute, browserHistory } from 'react-router'
 import { syncHistoryWithStore, routerReducer } from 'react-router-redux'
 
-// XXX instead of this combiner, import all of them and list them
-// make calling combineReducers().
-import * as reducers from './reducers'
+import picks from './picks/reducers'
+import select from './home/reducers'
 
 import App from './main/app'
 import Home from './home/components'
@@ -23,7 +22,9 @@ import { fetchPicks } from './picks/actions'
 const loggerMiddleware = createLogger()
 
 const reducer = combineReducers({
-  ...reducers,
+  // ...reducers,
+  picks,
+  select,
   routing: routerReducer
 })
 
