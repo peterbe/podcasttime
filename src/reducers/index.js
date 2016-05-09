@@ -1,2 +1,2 @@
-export podcasts from './podcasts'
-export picksRootReducer from './picks'
+export podcasts from '../home/reducers'
+export picksRootReducer from '../picks/reducers'

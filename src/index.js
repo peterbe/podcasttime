@@ -11,10 +11,16 @@ import { Provider } from 'react-redux'
 import { Router, Route, IndexRoute, browserHistory } from 'react-router'
 import { syncHistoryWithStore, routerReducer } from 'react-router-redux'
 
+// XXX instead of this combiner, import all of them and list them
+// make calling combineReducers().
 import * as reducers from './reducers'
-// import { App, Home, Foo, Bar } from './components'
-import { App, Home, Picks } from './components'
-import { fetchPicks } from './actions/picks'
+// import { App, Home, Picks } from './components'
+// import { App, Home } from './components'
+// import { App } from './components'
+import App from './main/app'
+import Home from './home/components'
+import Picks from './picks/components'
+import { fetchPicks } from './picks/actions'
 
 const loggerMiddleware = createLogger()
 
@@ -38,12 +44,10 @@ const store = createStore(
 )
 
 
+// XXX see about moving this into picks/components.js towards the bottom
 const onEnterPicks = (nextState, replace, callback) => {
-  console.log("in onEnterPicks", nextState, replace);
-  let page = parseInt(nextState.params.page || "1")
-  console.log('Here in onEnterPicks', page);
+  let page = parseInt(nextState.params.page || "1", 10)
   store.dispatch(fetchPicks(page))
-  console.log('Dispatched');
   callback()
 }
 

@@ -5,7 +5,7 @@ import {
   selectPage,
   requestPicks,
   fetchPicks,
-} from '../actions/picks'
+} from '../picks/actions'
 // import {
 //   selectPodcastID,
 // } from '../actions/podcasts'
@@ -30,7 +30,7 @@ class Home extends Component {
   componentDidMount() {
     const { dispatch, selectedPage } = this.props
     let page = parseInt(this.props.params.page || "1")
-    console.log('Here in Picks.Home.componentDidMount', page);
+    console.log('Here in Picks.Picks.componentDidMount', page);
     // console.log('PAGE:', page, 'SELECTEDPAGE', selectedPage);
     // dispatch(selectPage(page))
     // dispatch(fetchPicks(page))
@@ -40,6 +40,7 @@ class Home extends Component {
   handlePageChange(event, page) {
     event.preventDefault()
 
+    // Use <Link> instead in the JSX render
     if (page > 1) {
       browserHistory.push(`/picks/${page}`)
     } else {
@@ -74,10 +75,10 @@ class Home extends Component {
   }
 }
 
-const Picks = ({picks}) => {
-  return
-
-}
+// const Picks = ({picks}) => {
+//   return
+//
+// }
 
 const Pick = ({pick}) => {
   // XXX stop using style tags

@@ -4,7 +4,8 @@ import {
   addPodcast,
   removePodcast,
   removeAllPodcasts,
-} from '../actions/podcasts'
+} from '../home/actions'
+
 
 function Home({ podcasts, addPodcast, removePodcast, removeAllPodcasts }) {
   // console.log('PODCASTS...');
@@ -90,10 +91,6 @@ const Podcast = ({podcast, removePodcast}) => {
   )
 }
 
-export default connect(
-  state => ({ podcasts: state.podcasts }),
-  { addPodcast, removePodcast, removeAllPodcasts }
-)(Home)
 
 
 class MainSearch extends React.Component {
@@ -186,3 +183,8 @@ class MainSearch extends React.Component {
     );
   }
 }
+
+export default connect(
+  state => ({ podcasts: state.podcasts }),
+  { addPodcast, removePodcast, removeAllPodcasts }
+)(Home)

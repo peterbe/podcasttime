@@ -1,5 +1,0 @@
-export App from './App'
-export Home from './home'
-export Picks from './picks'
-//export Foo from './Foo'
-//  export Bar from './Bar'
