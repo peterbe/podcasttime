@@ -14,6 +14,8 @@ export default function App({ children }) {
         {' '}
         <Link to="/">Home</Link>
         {' '}
+        <Link to="/podcasts">Podcasts</Link>
+        {' '}
       </header>
       <div>
         <button onClick={() => browserHistory.push('/picks')}>Go to /picks</button>
