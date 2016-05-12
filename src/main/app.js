@@ -20,7 +20,7 @@ export default function App({ children }) {
       <div>
         <button onClick={() => browserHistory.push('/picks')}>Go to /picks</button>
       </div>
-      <div style={{ marginTop: '1.5em' }}>{children}</div>
+      <div className="ui main container" style={{ marginTop: '1.5em' }}>{children}</div>
     </div>
   )
 }

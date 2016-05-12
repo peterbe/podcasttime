@@ -55,7 +55,7 @@ class Home extends Component {
       )
     }
     return (
-      <div className="ui text container">
+      <div className="ui container">
         <h2>Picks - Page {this.props.selectedPage}</h2>
         {
           items.map((pick) => {
@@ -94,7 +94,7 @@ const Podcast = ({podcast}) => {
   return (
     <div
       className="ui centered card"
-      title="{podcast.title}">
+      title={podcast.name}>
       <a className="image" href={podcastURL(podcast)}
         onClick={(event) => handlePocastClick(event, podcast)}>
         {
@@ -102,10 +102,11 @@ const Podcast = ({podcast}) => {
           <img src={podcast.image}/> :
           <img src="/static/podcasttime/images/no-image.png"/>
          }
+         <span className="floating ui teal label" title="Times picked">
+           {podcast.times_picked}
+         </span>
+
       </a>
-      <div className="floating ui teal label" title="Times picked">
-        {podcast.times_picked}
-      </div>
     </div>
   )
 }

@@ -25,6 +25,7 @@ function receivePodcasts(page, json) {
   return {
     type: RECEIVE_PODCASTS,
     page: page,
+    count: json.count,
     items: json.items,
     pagination: json.pagination,
   }

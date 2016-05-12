@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
 import { Link, browserHistory } from 'react-router'
+import { FormattedNumber, FormattedPlural, FormattedRelative } from 'react-intl';
 import {
   selectPage,
   requestPicks,
@@ -14,6 +15,7 @@ class Home extends Component {
     selectedPage: PropTypes.number.isRequired,
     items: PropTypes.array.isRequired,
     isFetching: PropTypes.bool.isRequired,
+    totalCount: PropTypes.number.isRequired,
     // lastUpdated: PropTypes.number,
   }
 
@@ -36,24 +38,23 @@ class Home extends Component {
   }
 
   render() {
-    const { isFetching, selectedPage, items, pagination } = this.props
-    if (isFetching) {
+    if (this.props.isFetching) {
       return (
-        <div className="ui text container">
+        <div className="ui container">
           Fetching.... fetching... fetching...
         </div>
       )
     }
     return (
-      <div className="ui text container">
+      <div className="ui container">
         <h5 className="ui right aligned header">
-          { this.props.count } podcasts found.
+          <FormattedNumber value={this.props.totalCount} /> podcasts found.
         </h5>
         <form>form here</form>
         {/*<h2>Podcasts - Page {this.props.selectedPage}</h2>*/}
         <div className="ui link cards">
           {
-            items.map((podcast) => {
+            this.props.items.map((podcast) => {
               return <Podcast key={podcast.id} podcast={podcast}/>
             })
           }
@@ -61,7 +62,7 @@ class Home extends Component {
 
         <Pagination
           handlePageChange={this.handlePageChange}
-          pagination={pagination}/>
+          pagination={this.props.pagination}/>
       </div>
     )
   }
@@ -76,6 +77,7 @@ const Podcast = ({podcast}) => {
     // console.log(podcastURL(podcast))
   }
 
+  let updateDate = podcast.last_fetch ? podcast.last_fetch : podcast.modified
   return (
     <div className="ui centered card">
       <a className="image" href={podcastURL(podcast)}
@@ -88,25 +90,32 @@ const Podcast = ({podcast}) => {
       </a>
 
       <div className="content">
-        <a className="image" href={podcastURL(podcast)}
+        <a className="header" href={podcastURL(podcast)}
           onClick={(event) => handlePocastClick(event, podcast)}>
           {podcast.name}
         </a>
         <div className="meta">
           <span className="date">
-            Last updated {podcast.last_fetch ? podcast.last_fetch : podcast.modified } ago
+            Last updated <FormattedRelative value={updateDate} />
           </span>
         </div>
+        <div className="description">
+          <PodcastDescription
+            episodeCount={podcast.episode_count}
+            episodeHours={Math.ceil(podcast.episode_seconds / 3600)}
+            />
+        </div>
       </div>
-      <div className="description">
-        <PodcastDescription
-          episodeCount={podcast.episode_count}
-          episodeHours={podcast.episode_hours}
-          />
-      </div>
+
       <div className="extra content">
         <a>
-          Picked <b>{podcast.times_picked}</b> times
+
+          Picked <b>{podcast.times_picked}</b> {' '}
+          <FormattedPlural
+            value={podcast.times_picked}
+            one="time"
+            other="times"
+          />
         </a>
       </div>
 
@@ -121,7 +130,8 @@ const PodcastDescription = ({ episodeCount, episodeHours}) => {
   if (episodeCount) {
     return (
       <span>
-        <b>{episodeCount}</b> episodes, <b>{episodeHours}</b> hours of content.
+        <b><FormattedNumber value={episodeCount} /></b> episodes,{' '}
+        <b><FormattedNumber value={episodeHours} /></b> hours of content.
       </span>
     )
   } else {
@@ -195,11 +205,12 @@ function mapStateToProps(state) {
     items: [],
     pagination: {}
   }
-
+  let totalCount = podcastsByPage.count || 0
   return {
     selectedPage,
     items,
     isFetching,
+    totalCount,
     pagination,
     // lastUpdated
   }

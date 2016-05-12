@@ -10,6 +10,7 @@ import createLogger from 'redux-logger'
 import { Provider } from 'react-redux'
 import { Router, Route, IndexRoute, browserHistory } from 'react-router'
 import { syncHistoryWithStore, routerReducer } from 'react-router-redux'
+import { IntlProvider } from 'react-intl';
 
 import picks from './picks/reducers'
 import select from './home/reducers'
@@ -63,23 +64,25 @@ const onEnterPodcasts = (nextState, replace, callback) => {
 const history = syncHistoryWithStore(browserHistory, store)
 
 ReactDOM.render(
-  <Provider store={store}>
-    <div>
-      <Router history={history}>
-        <Route path="/" component={App}>
-          <IndexRoute component={Home}/>
-          <Route path="picks" component={Picks}
-            onEnter={onEnterPicks}/>
-          <Route path="picks/:page" component={Picks}
-            onEnter={onEnterPicks}/>
-          <Route path="podcasts" component={Podcasts}
-            onEnter={onEnterPodcasts}/>
-          <Route path="podcasts/:page" component={Podcasts}
-            onEnter={onEnterPodcasts}/>
-        </Route>
-      </Router>
-      {/*<DevTools />*/}
-    </div>
-  </Provider>,
+  <IntlProvider locale={navigator.language}>
+    <Provider store={store}>
+      <div>
+        <Router history={history}>
+          <Route path="/" component={App}>
+            <IndexRoute component={Home}/>
+            <Route path="picks" component={Picks}
+              onEnter={onEnterPicks}/>
+            <Route path="picks/:page" component={Picks}
+              onEnter={onEnterPicks}/>
+            <Route path="podcasts" component={Podcasts}
+              onEnter={onEnterPodcasts}/>
+            <Route path="podcasts/:page" component={Podcasts}
+              onEnter={onEnterPodcasts}/>
+          </Route>
+        </Router>
+        {/*<DevTools />*/}
+      </div>
+    </Provider>
+  </IntlProvider>,
   document.getElementById('root')
 )

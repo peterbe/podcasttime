@@ -18,6 +18,7 @@ function selectedPage(state = 1, action) {
 
 function getPodcasts(state = {
   isFetching: false,
+  totalCount: null,
   items: [],
   page: 1,
 }, action) {
@@ -30,6 +31,7 @@ function getPodcasts(state = {
       return Object.assign({}, state, {
         isFetching: false,
         page: action.page,
+        totalCount: action.count,
         items: action.items,
         pagination: action.pagination,
       })
@@ -44,6 +46,7 @@ function podcastsByPage(state = { }, action) {
     case RECEIVE_PODCASTS:
     case REQUEST_PODCASTS:
       return Object.assign({}, state, {
+        count: action.count,
         [action.page]: getPodcasts(state[action.page], action)
       })
     default:
