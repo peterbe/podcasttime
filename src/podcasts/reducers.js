@@ -3,6 +3,7 @@ import {
   REQUEST_PODCASTS,
   RECEIVE_PODCASTS,
   SELECT_PODCASTS_PAGE,
+  SET_PODCASTS_SEARCH,
 } from './constants'
 
 
@@ -16,10 +17,21 @@ function selectedPage(state = 1, action) {
 }
 
 
+function search(state = '', action) {
+  switch (action.type) {
+    case SET_PODCASTS_SEARCH:
+      return action.search
+    default:
+      return state
+  }
+}
+
+
 function getPodcasts(state = {
   isFetching: false,
   totalCount: null,
   items: [],
+  search: '',
   page: 1,
 }, action) {
   switch (action.type) {
@@ -31,6 +43,7 @@ function getPodcasts(state = {
       return Object.assign({}, state, {
         isFetching: false,
         page: action.page,
+        search: action.search,
         totalCount: action.count,
         items: action.items,
         pagination: action.pagination,
@@ -42,12 +55,13 @@ function getPodcasts(state = {
 
 
 function podcastsByPage(state = { }, action) {
+  // console.log("In podcastsByPage", action, state);
   switch (action.type) {
     case RECEIVE_PODCASTS:
-    case REQUEST_PODCASTS:
+      let key = 'p:' + action.page + 'search:' + action.search
       return Object.assign({}, state, {
         count: action.count,
-        [action.page]: getPodcasts(state[action.page], action)
+        [key]: getPodcasts(state[key], action)
       })
     default:
       return state
@@ -59,6 +73,7 @@ function podcastsByPage(state = { }, action) {
 const podcasts = combineReducers({
   podcastsByPage,
   selectedPage,
+  search,
 })
 
 export default podcasts

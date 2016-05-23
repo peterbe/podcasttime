@@ -55,8 +55,9 @@ const onEnterPicks = (nextState, replace, callback) => {
   callback()
 }
 const onEnterPodcasts = (nextState, replace, callback) => {
+  let search = nextState.params.search || ''
   let page = parseInt(nextState.params.page || "1", 10)
-  store.dispatch(fetchPodcasts(page))
+  store.dispatch(fetchPodcasts(search, page))
   callback()
 }
 
@@ -76,7 +77,12 @@ ReactDOM.render(
               onEnter={onEnterPicks}/>
             <Route path="podcasts" component={Podcasts}
               onEnter={onEnterPodcasts}/>
-            <Route path="podcasts/:page" component={Podcasts}
+              <Route path="podcasts/p:page" component={Podcasts}
+                onEnter={onEnterPodcasts}/>
+            <Route path="podcasts/:search" component={Podcasts}
+              onEnter={onEnterPodcasts}/>
+
+            <Route path="podcasts/:search/p:page" component={Podcasts}
               onEnter={onEnterPodcasts}/>
           </Route>
         </Router>

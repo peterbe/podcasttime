@@ -12,14 +12,13 @@ export default function App({ children }) {
       <header>
         Links:
         {' '}
-        <Link to="/">Home</Link>
+        <Link to="/" activeClassName="active">Home</Link>
         {' '}
-        <Link to="/podcasts">Podcasts</Link>
+        <Link to="/podcasts" activeClassName="active">Podcasts</Link>
+        {' '}
+        <Link to="/picks" activeClassName="active">Picks</Link>
         {' '}
       </header>
-      <div>
-        <button onClick={() => browserHistory.push('/picks')}>Go to /picks</button>
-      </div>
       <div className="ui main container" style={{ marginTop: '1.5em' }}>{children}</div>
     </div>
   )

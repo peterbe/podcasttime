@@ -8,6 +8,7 @@ import {
   fetchPicks,
 } from '../picks/actions'
 import { podcastURL, picksURL } from '../utils'
+import { RippleCentered } from '../main/components'
 
 
 class Home extends Component {
@@ -22,78 +23,115 @@ class Home extends Component {
   constructor(props) {
     super(props)
     this.handlePageChange = this.handlePageChange.bind(this)
+    this.submitSearch = this.submitSearch.bind(this)
   }
 
   handlePageChange(event, page) {
     event.preventDefault()
-
+    throw new Error("use Link instead")
     // XXX Use <Link> instead in the JSX render
     if (page > 1) {
-      browserHistory.push(`/podcasts/${page}`)
+      browserHistory.push(`/podcasts/p${page}`)
     } else {
       browserHistory.push(`/podcasts`)
     }
-    // this.props.dispatch(fetchPicks(page))
-    // this.props.dispatch(selectPage(page))
+  }
+
+  submitSearch(term) {
+    if (term) {
+      browserHistory.push(`/podcasts/${term}`)
+    } else {
+      browserHistory.push(`/podcasts/`)
+    }
   }
 
   render() {
-    if (this.props.isFetching) {
-      return (
-        <div className="ui container">
-          Fetching.... fetching... fetching...
-        </div>
-      )
-    }
     return (
       <div className="ui container">
-        <h5 className="ui right aligned header">
-          <FormattedNumber value={this.props.totalCount} /> podcasts found.
-        </h5>
-        <form>form here</form>
-        {/*<h2>Podcasts - Page {this.props.selectedPage}</h2>*/}
-        <div className="ui link cards">
-          {
-            this.props.items.map((podcast) => {
-              return <Podcast key={podcast.id} podcast={podcast}/>
-            })
-          }
-        </div>
+        <SearchForm
+          onSubmit={this.submitSearch}
+          search={this.props.search}/>
 
-        <Pagination
-          handlePageChange={this.handlePageChange}
-          pagination={this.props.pagination}/>
+        <h5 className="ui right aligned header">
+          {/* Consider adding a link there class "Clear" after 'found.' */}
+          {
+            !this.props.isFetching ?
+            <span><FormattedNumber value={this.props.totalCount} /> podcasts found.</span> :
+            <i>loading...</i>
+          }
+        </h5>
+        {/*<h2>Podcasts - Page {this.props.selectedPage}</h2>*/}
+
+        { this.props.isFetching ? <RippleCentered scale={2}/> :
+          <div>
+            <div className="ui link cards">
+              {
+                this.props.items.map((podcast) => {
+                  return <Podcast key={podcast.id} podcast={podcast}/>
+                })
+              }
+            </div>
+            <Pagination
+              handlePageChange={this.handlePageChange}
+              search={this.props.search}
+              pagination={this.props.pagination}/>
+          </div>
+        }
       </div>
     )
   }
 }
 
+class SearchForm extends React.Component {
+  constructor(props) {
+    super(props)
+    this._onSubmit = this._onSubmit.bind(this)
+  }
+
+  _onSubmit(event) {
+    event.preventDefault()
+    this.props.onSubmit(this.refs.q.value.trim())
+  }
+
+  render() {
+    return (
+      <form action="." className="ui search" onSubmit={this._onSubmit}
+        style={{marginBottom: 30}}>
+        <div className="ui fluid huge icon input">
+          <input
+            type="text"
+            ref="q"
+            name="search"
+            placeholder="Search..."
+            defaultValue={this.props.search} />
+          <i className="search icon"></i>
+        </div>
+      </form>
+    )
+  }
+}
 
 const Podcast = ({podcast}) => {
   const handlePocastClick = (event, podcast) => {
     event.preventDefault()
-    // selectPodcastID()
     browserHistory.push(podcastURL(podcast))
-    // console.log(podcastURL(podcast))
   }
 
   let updateDate = podcast.last_fetch ? podcast.last_fetch : podcast.modified
   return (
     <div className="ui centered card">
-      <a className="image" href={podcastURL(podcast)}
-        onClick={(event) => handlePocastClick(event, podcast)}>
+      <Link to={podcastURL(podcast)} className="image">
         {
           podcast.image ?
           <img src={podcast.image}/> :
           <img src="/static/images/no-image.png"/>
          }
-      </a>
+      </Link>
 
       <div className="content">
-        <a className="header" href={podcastURL(podcast)}
-          onClick={(event) => handlePocastClick(event, podcast)}>
+        <Link to={podcastURL(podcast)} className="header">
           {podcast.name}
-        </a>
+        </Link>
         <div className="meta">
           <span className="date">
             Last updated <FormattedRelative value={updateDate} />
@@ -143,7 +181,11 @@ PodcastDescription.propTypes = {
   episodeHours: PropTypes.number.isRequired,
 }
 
-const Pagination = ({pagination, handlePageChange}) => {
+const Pagination = ({
+  pagination,
+  handlePageChange,
+  search,
+}) => {
 
   const prev = (page) => {
     return `← Page ${page}`
@@ -157,32 +199,54 @@ const Pagination = ({pagination, handlePageChange}) => {
     return `Page ${number} or ${pages}`
   }
 
+  let nextLink = null
+  if (pagination.has_next) {
+    let nextURL = '/podcasts'
+    if (search) {
+      nextURL += '/' + search
+    }
+    nextURL += '/p' + pagination.next_page_number
+    nextLink = (
+      <Link className="item" to={nextURL}>
+        {next(pagination.next_page_number)}
+      </Link>
+    )
+  } else {
+    nextLink = (
+      <a className="item disabled">
+        Page{' '}{pagination.num_pages}
+      </a>
+    )
+  }
+
+  let prevLink = null
+  if (pagination.has_previous) {
+    let prevURL = '/podcasts'
+    if (search) {
+      prevURL += '/' + search
+    }
+    prevURL += '/p' + pagination.previous_page_number
+    prevLink = (
+      <Link to={prevURL} className="item">
+        {prev(pagination.previous_page_number)}
+      </Link>
+    )
+  } else {
+    prevLink = (
+      <a className="item disabled">
+        Page 1
+      </a>
+    )
+  }
+
   return (
     <div className="ui two column centered grid" style={{marginTop: 100}}>
       <div className="ui pagination menu">
-        {
-          pagination.has_previous ?
-          <a className="item" href={picksURL(pagination.previous_page_number)}
-            onClick={(event) => handlePageChange(event, pagination.previous_page_number)}>
-            {prev(pagination.previous_page_number)}
-          </a>
-          :
-          null
-        }
+        { prevLink }
         <a className="item disabled">
           {current(pagination.number, pagination.num_pages)}
         </a>
-        {
-          pagination.has_next ?
-          <a className="item" href={picksURL(pagination.next_page_number)}
-            onClick={(event) => handlePageChange(event, pagination.next_page_number)}>
-            {next(pagination.next_page_number)}
-          </a>
-          :
-          <a className="item disabled">
-            Page{' '}{pagination.num_pages}
-          </a>
-        }
+        { nextLink }
       </div>
     </div>
   )
@@ -190,17 +254,20 @@ const Pagination = ({pagination, handlePageChange}) => {
 Pagination.propTypes = {
   handlePageChange: PropTypes.func.isRequired,
   pagination: PropTypes.object.isRequired,
+  search: PropTypes.string,
 }
 
 
 function mapStateToProps(state) {
-  const { podcastsByPage, selectedPage } = state.podcasts
+  // console.log('in mapStateToProps', state.podcasts);
+  const { podcastsByPage, selectedPage, search } = state.podcasts
+  let key = 'p:' + selectedPage + 'search:' + search
   const {
     isFetching,
     // lastUpdated,
     items,
     pagination
-  } = podcastsByPage[selectedPage] || {
+  } = podcastsByPage[key] || {
     isFetching: true,
     items: [],
     pagination: {}
@@ -208,6 +275,7 @@ function mapStateToProps(state) {
   let totalCount = podcastsByPage.count || 0
   return {
     selectedPage,
+    search,
     items,
     isFetching,
     totalCount,

@@ -4,15 +4,16 @@ import {
   RECEIVE_PODCASTS,
   REQUEST_PODCASTS,
   SELECT_PODCASTS_PAGE,
+  SET_PODCASTS_SEARCH,
  } from './constants'
 
 
-export function requestPodcasts(page = 1) {
-  return {
-    type: REQUEST_PODCASTS,
-    page,
-  }
-}
+// export function requestPodcasts(page = 1) {
+//   return {
+//     type: REQUEST_PODCASTS,
+//     page,
+//   }
+// }
 
 export function selectPage(page = 1) {
   return {
@@ -21,9 +22,17 @@ export function selectPage(page = 1) {
   }
 }
 
-function receivePodcasts(page, json) {
+export function setSearch(search = '') {
+  return {
+    type: SET_PODCASTS_SEARCH,
+    search
+  }
+}
+
+function receivePodcasts(search, page, json) {
   return {
     type: RECEIVE_PODCASTS,
+    search: search,
     page: page,
     count: json.count,
     items: json.items,
@@ -31,12 +40,13 @@ function receivePodcasts(page, json) {
   }
 }
 
-export function fetchPodcasts(page = 1) {
+export function fetchPodcasts(search = '', page = 1) {
   return dispatch => {
+    dispatch(setSearch(search))
     dispatch(selectPage(page))
-    return fetch(`/api/podcasts/data/?page=${page}`)
+    return fetch(`/api/podcasts/data/?page=${page}&search=${search}`)
       .then(response => response.json())
-      .then(json => dispatch(receivePodcasts(page, json)))
+      .then(json => dispatch(receivePodcasts(search, page, json)))
   }
 }
 
