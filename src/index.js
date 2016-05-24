@@ -47,18 +47,34 @@ const store = createStore(
   // DevTools.instrument()
 )
 
-
-// XXX see about moving this into picks/components.js towards the bottom
-const onEnterPicks = (nextState, replace, callback) => {
-  let page = parseInt(nextState.params.page || "1", 10)
+const onEnterPicks = (nextState, replace) => {
+  let { query } = nextState.location
+  let page = query && parseInt(query.page, 10) || 1
   store.dispatch(fetchPicks(page))
-  callback()
 }
-const onEnterPodcasts = (nextState, replace, callback) => {
+
+const onChangePicks = (prevState, nextState, replace) => {
+  let { query } = nextState.location
+  let page = query && parseInt(query.page, 10) || 1
+  store.dispatch(fetchPicks(page))
+}
+
+
+const onEnterPodcasts = (nextState, replace) => {
+  let { query } = nextState.location
   let search = nextState.params.search || ''
-  let page = parseInt(nextState.params.page || "1", 10)
+  let page = query && parseInt(query.page, 10) || 1
+  // console.log('ONENTER', search, page);
   store.dispatch(fetchPodcasts(search, page))
-  callback()
+  // callback()
+}
+
+const onChangePodcasts = (prevState, nextState, replace) => {
+  let { query } = nextState.location
+  let search = nextState.params.search || ''
+  let page = query && parseInt(query.page, 10) || 1
+  // console.log('ONCHANGE', search, page);
+  store.dispatch(fetchPodcasts(search, page))
 }
 
 
@@ -72,18 +88,13 @@ ReactDOM.render(
           <Route path="/" component={App}>
             <IndexRoute component={Home}/>
             <Route path="picks" component={Picks}
-              onEnter={onEnterPicks}/>
-            <Route path="picks/:page" component={Picks}
-              onEnter={onEnterPicks}/>
+              onEnter={onEnterPicks} onChange={onChangePicks}/>
             <Route path="podcasts" component={Podcasts}
-              onEnter={onEnterPodcasts}/>
-              <Route path="podcasts/p:page" component={Podcasts}
-                onEnter={onEnterPodcasts}/>
+              onEnter={onEnterPodcasts} onChange={onChangePodcasts}/>
             <Route path="podcasts/:search" component={Podcasts}
-              onEnter={onEnterPodcasts}/>
-
-            <Route path="podcasts/:search/p:page" component={Podcasts}
-              onEnter={onEnterPodcasts}/>
+              onEnter={onEnterPodcasts}  onChange={onChangePodcasts}/>
+            <Route path="podcasts/:id/:slug" component={Podcasts}
+              onEnter={onEnterPodcasts}  onChange={onChangePodcasts}/>
           </Route>
         </Router>
         {/*<DevTools />*/}

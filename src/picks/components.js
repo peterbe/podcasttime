@@ -6,7 +6,8 @@ import {
   requestPicks,
   fetchPicks,
 } from '../picks/actions'
-import { podcastURL, picksURL } from '../utils'
+import { podcastURL } from '../utils'
+import { RippleCentered } from '../main/components'
 
 
 class Home extends Component {
@@ -19,52 +20,24 @@ class Home extends Component {
 
   constructor(props) {
     super(props)
-    this.handlePageChange = this.handlePageChange.bind(this)
-  }
-
-  // componentDidMount() {
-  //   const { dispatch, selectedPage } = this.props
-  //   let page = parseInt(this.props.params.page || "1")
-  //   // console.log('Here in Picks.Picks.componentDidMount', page);
-  //   // console.log('PAGE:', page, 'SELECTEDPAGE', selectedPage);
-  //   // dispatch(selectPage(page))
-  //   // dispatch(fetchPicks(page))
-  //   // dispatch()
-  // }
-
-  handlePageChange(event, page) {
-    event.preventDefault()
-
-    // XXX Use <Link> instead in the JSX render
-    if (page > 1) {
-      browserHistory.push(`/picks/${page}`)
-    } else {
-      browserHistory.push(`/picks`)
-    }
-    // this.props.dispatch(fetchPicks(page))
-    // this.props.dispatch(selectPage(page))
   }
 
   render() {
     const { isFetching, selectedPage, items, pagination } = this.props
-    if (isFetching) {
-      return (
-        <div className="ui text container">
-          Fetching.... fetching... fetching...
-        </div>
-      )
-    }
     return (
       <div className="ui container">
         <h2>Picks - Page {this.props.selectedPage}</h2>
-        {
-          items.map((pick) => {
-            return <Pick key={pick.id} pick={pick}/>
-          })
-        }
-        <Pagination
-          handlePageChange={this.handlePageChange}
-          pagination={pagination}/>
+          { this.props.isFetching ? <RippleCentered scale={2}/> :
+            <div>
+              {
+                items.map((pick) => {
+                  return <Pick key={pick.id} pick={pick}/>
+                })
+              }
+              <Pagination
+                pagination={this.props.pagination}/>
+            </div>
+          }
       </div>
     )
   }
@@ -84,19 +57,12 @@ const Pick = ({pick}) => {
 }
 
 const Podcast = ({podcast}) => {
-  const handlePocastClick = (event, podcast) => {
-    event.preventDefault()
-    // selectPodcastID()
-    browserHistory.push(podcastURL(podcast))
-    // console.log(podcastURL(podcast))
-  }
-
+  let linkURL = `/podcasts/${podcast.id}/${podcast.slug}`
   return (
     <div
       className="ui centered card"
       title={podcast.name}>
-      <a className="image" href={podcastURL(podcast)}
-        onClick={(event) => handlePocastClick(event, podcast)}>
+      <Link className="image" to={linkURL}>
         {
           podcast.image ?
           <img src={podcast.image}/> :
@@ -105,14 +71,13 @@ const Podcast = ({podcast}) => {
          <span className="floating ui teal label" title="Times picked">
            {podcast.times_picked}
          </span>
-
-      </a>
+      </Link>
     </div>
   )
 }
 
 
-const Pagination = ({pagination, handlePageChange}) => {
+const Pagination = ({ pagination }) => {
 
   const prev = (page) => {
     return `← Page ${page}`
@@ -126,38 +91,56 @@ const Pagination = ({pagination, handlePageChange}) => {
     return `Page ${number} or ${pages}`
   }
 
+
+  let nextLink = null
+  if (pagination.has_next) {
+    nextLink = (
+      <Link className="item" to={{
+          pathname: '/picks',
+          query: { page: pagination.next_page_number },
+        }}>
+        {next(pagination.next_page_number)}
+      </Link>
+    )
+  } else {
+    nextLink = (
+      <a className="item disabled">
+        Page{' '}{pagination.num_pages}
+      </a>
+    )
+  }
+
+  let prevLink = null
+  if (pagination.has_previous) {
+    prevLink = (
+      <Link className="item" to={{
+          pathname: '/picks',
+          query: { page: pagination.previous_page_number },
+        }}>
+        {prev(pagination.previous_page_number)}
+      </Link>
+    )
+  } else {
+    prevLink = (
+      <a className="item disabled">
+        Page 1
+      </a>
+    )
+  }
+
   return (
     <div className="ui two column centered grid" style={{marginTop: 100}}>
       <div className="ui pagination menu">
-        {
-          pagination.has_previous ?
-          <a className="item" href={picksURL(pagination.previous_page_number)}
-            onClick={(event) => handlePageChange(event, pagination.previous_page_number)}>
-            {prev(pagination.previous_page_number)}
-          </a>
-          :
-          null
-        }
+        { prevLink }
         <a className="item disabled">
           {current(pagination.number, pagination.num_pages)}
         </a>
-        {
-          pagination.has_next ?
-          <a className="item" href={picksURL(pagination.next_page_number)}
-            onClick={(event) => handlePageChange(event, pagination.next_page_number)}>
-            {next(pagination.next_page_number)}
-          </a>
-          :
-          <a className="item disabled">
-            Page{' '}{pagination.num_pages}
-          </a>
-        }
+        { nextLink }
       </div>
     </div>
   )
 }
 Pagination.propTypes = {
-  handlePageChange: PropTypes.func.isRequired,
   pagination: PropTypes.object.isRequired,
 }
 

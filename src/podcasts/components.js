@@ -22,26 +22,14 @@ class Home extends Component {
 
   constructor(props) {
     super(props)
-    this.handlePageChange = this.handlePageChange.bind(this)
     this.submitSearch = this.submitSearch.bind(this)
-  }
-
-  handlePageChange(event, page) {
-    event.preventDefault()
-    throw new Error("use Link instead")
-    // XXX Use <Link> instead in the JSX render
-    if (page > 1) {
-      browserHistory.push(`/podcasts/p${page}`)
-    } else {
-      browserHistory.push(`/podcasts`)
-    }
   }
 
   submitSearch(term) {
     if (term) {
       browserHistory.push(`/podcasts/${term}`)
     } else {
-      browserHistory.push(`/podcasts/`)
+      browserHistory.push(`/podcasts`)
     }
   }
 
@@ -54,6 +42,8 @@ class Home extends Component {
 
         <h5 className="ui right aligned header">
           {/* Consider adding a link there class "Clear" after 'found.' */}
+          Page{' '}{ this.props.selectedPage }
+          {' - '}
           {
             !this.props.isFetching ?
             <span><FormattedNumber value={this.props.totalCount} /> podcasts found.</span> :
@@ -72,7 +62,6 @@ class Home extends Component {
               }
             </div>
             <Pagination
-              handlePageChange={this.handlePageChange}
               search={this.props.search}
               pagination={this.props.pagination}/>
           </div>
@@ -183,7 +172,6 @@ PodcastDescription.propTypes = {
 
 const Pagination = ({
   pagination,
-  handlePageChange,
   search,
 }) => {
 
@@ -205,9 +193,12 @@ const Pagination = ({
     if (search) {
       nextURL += '/' + search
     }
-    nextURL += '/p' + pagination.next_page_number
+    // nextURL += '/p' + pagination.next_page_number
     nextLink = (
-      <Link className="item" to={nextURL}>
+      <Link className="item" to={{
+          pathname: nextURL,
+          query: { page: pagination.next_page_number },
+        }}>
         {next(pagination.next_page_number)}
       </Link>
     )
@@ -225,9 +216,11 @@ const Pagination = ({
     if (search) {
       prevURL += '/' + search
     }
-    prevURL += '/p' + pagination.previous_page_number
     prevLink = (
-      <Link to={prevURL} className="item">
+      <Link to={{
+          pathname: prevURL,
+          query: { page: pagination.previous_page_number },
+        }} className="item">
         {prev(pagination.previous_page_number)}
       </Link>
     )
@@ -252,7 +245,6 @@ const Pagination = ({
   )
 }
 Pagination.propTypes = {
-  handlePageChange: PropTypes.func.isRequired,
   pagination: PropTypes.object.isRequired,
   search: PropTypes.string,
 }
@@ -261,6 +253,7 @@ Pagination.propTypes = {
 function mapStateToProps(state) {
   // console.log('in mapStateToProps', state.podcasts);
   const { podcastsByPage, selectedPage, search } = state.podcasts
+  // const { routing } = state
   let key = 'p:' + selectedPage + 'search:' + search
   const {
     isFetching,
