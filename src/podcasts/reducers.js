@@ -35,7 +35,7 @@ function getPodcasts(state = {
   page: 1,
 }, action) {
   switch (action.type) {
-      case REQUEST_PODCASTS:
+    case REQUEST_PODCASTS:
       return Object.assign({}, state, {
         isFetching: true,
       })

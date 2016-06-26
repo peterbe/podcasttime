@@ -8,3 +8,11 @@ export const picksURL = (page = 1) => {
   }
   return `/picks/${page}`
 }
+
+export const updateDocumentTitle = (title = null) => {
+  if (title !== null) {
+    document.title = `${title} - PodcastTime`
+  } else {
+    document.title = 'PodcastTime'
+  }
+}

@@ -1,14 +1,13 @@
 import {
-  ADD_PODCAST,
+  ADD_PODCASTS,
   REMOVE_PODCAST,
   REMOVE_ALL_PODCASTS,
  } from './constants'
 
-
-export function addPodcast(podcast) {
+export function addPodcasts(podcasts) {
   return {
-    type: ADD_PODCAST,
-    podcast: podcast
+    type: ADD_PODCASTS,
+    podcasts: podcasts
   }
 }
 

@@ -3,15 +3,14 @@ import { connect } from 'react-redux'
 import { Link, browserHistory } from 'react-router'
 import { FormattedNumber, FormattedPlural, FormattedRelative } from 'react-intl';
 import {
-  selectPage,
-  requestPicks,
-  fetchPicks,
-} from '../picks/actions'
-import { podcastURL, picksURL } from '../utils'
+  podcastURL,
+  picksURL,
+  updateDocumentTitle,
+} from '../utils'
 import { RippleCentered } from '../main/components'
 
 
-class Home extends Component {
+class Podcasts extends Component {
   static propTypes = {
     selectedPage: PropTypes.number.isRequired,
     items: PropTypes.array.isRequired,
@@ -34,6 +33,16 @@ class Home extends Component {
   }
 
   render() {
+    let title = 'Podcasts'
+    if (this.props.search && this.props.selectedPage > 1) {
+      title += ` ("${this.props.search}", page ${this.props.selectedPage})`
+    } else if (this.props.search) {
+      title += ` ("${this.props.search}")`
+    } else if (this.props.selectedPage > 1) {
+      title += ` (page ${this.props.selectedPage})`
+    }
+    updateDocumentTitle(title)
+
     return (
       <div className="ui container">
         <SearchForm
@@ -50,14 +59,13 @@ class Home extends Component {
             <i>loading...</i>
           }
         </h5>
-        {/*<h2>Podcasts - Page {this.props.selectedPage}</h2>*/}
 
         { this.props.isFetching ? <RippleCentered scale={2}/> :
           <div>
             <div className="ui link cards">
               {
                 this.props.items.map((podcast) => {
-                  return <Podcast key={podcast.id} podcast={podcast}/>
+                  return <PodcastCard key={podcast.id} podcast={podcast}/>
                 })
               }
             </div>
@@ -100,12 +108,7 @@ class SearchForm extends React.Component {
   }
 }
 
-const Podcast = ({podcast}) => {
-  const handlePocastClick = (event, podcast) => {
-    event.preventDefault()
-    browserHistory.push(podcastURL(podcast))
-  }
-
+const PodcastCard = ({podcast}) => {
   let updateDate = podcast.last_fetch ? podcast.last_fetch : podcast.modified
   return (
     <div className="ui centered card">
@@ -136,8 +139,7 @@ const Podcast = ({podcast}) => {
 
       <div className="extra content">
         <a>
-
-          Picked <b>{podcast.times_picked}</b> {' '}
+          Picked <b><FormattedNumber value={podcast.times_picked}/></b> {' '}
           <FormattedPlural
             value={podcast.times_picked}
             one="time"
@@ -149,7 +151,7 @@ const Podcast = ({podcast}) => {
     </div>
   )
 }
-Podcast.propTypes = {
+PodcastCard.propTypes = {
   podcast: PropTypes.object.isRequired,
 }
 
@@ -251,9 +253,7 @@ Pagination.propTypes = {
 
 
 function mapStateToProps(state) {
-  // console.log('in mapStateToProps', state.podcasts);
   const { podcastsByPage, selectedPage, search } = state.podcasts
-  // const { routing } = state
   let key = 'p:' + selectedPage + 'search:' + search
   const {
     isFetching,
@@ -277,4 +277,4 @@ function mapStateToProps(state) {
   }
 }
 
-export default connect(mapStateToProps)(Home)
+export default connect(mapStateToProps)(Podcasts)

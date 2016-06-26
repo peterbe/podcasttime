@@ -6,7 +6,7 @@ import {
   requestPicks,
   fetchPicks,
 } from '../picks/actions'
-import { podcastURL } from '../utils'
+import { podcastURL, updateDocumentTitle } from '../utils'
 import { RippleCentered } from '../main/components'
 
 
@@ -23,6 +23,7 @@ class Home extends Component {
   }
 
   render() {
+    updateDocumentTitle('Picks')
     const { isFetching, selectedPage, items, pagination } = this.props
     return (
       <div className="ui container">

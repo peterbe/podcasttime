@@ -1,29 +1,89 @@
-import React from 'react'
+import React, { Component, PropTypes } from 'react'
 import { connect } from 'react-redux'
+import { Link, browserHistory } from 'react-router'
 import {
-  addPodcast,
+  addPodcasts,
   removePodcast,
   removeAllPodcasts,
 } from '../home/actions'
+import { updateDocumentTitle } from '../utils'
 
 
-function Home({ podcasts, addPodcast, removePodcast, removeAllPodcasts }) {
-  // console.log('PODCASTS...');
-  // console.log(podcasts);
-  // console.log('AFTER3');
-  return (
-    <div className="ui text container">
-      <h1>How Much Time Do <i>Your</i> Podcasts Take To Listen To?</h1>
-      <MainSearch
-        addPodcast={addPodcast}
-        />
-      <Podcasts
-        podcasts={podcasts}
-        removePodcast={removePodcast}
-        removeAllPodcasts={removeAllPodcasts}
-        />
-    </div>
-  );
+// class Home({ podcasts, addPodcast, removePodcast, removeAllPodcasts }) extends Component {
+class Home extends Component {
+  static propTypes = {
+    podcasts: PropTypes.array.isRequired,
+  }
+
+  constructor(props) {
+    super(props)
+    // this.selectPodcast = this.selectPodcast.bind(this)
+    // console.log('PROPS', props);
+    // console.log('CONSTRUCTOR', props.podcasts);
+  }
+
+  componentDidMount() {
+    // If you arrived on the page with a ?ids=123,456 let's load those
+    // almost just as if the user had selected them.
+    // But be careful, if you come from a popState where you already
+    // have these loaded, then don't bother.
+    if (this.props.location.query.picks) {
+      let ids = this.props.location.query.picks.split(',').map(x=>parseInt(x))
+      // now remove the ones we have already loaded
+      let existingIds = this.props.podcasts.map(p=>p.id)
+      ids = ids.filter(x => existingIds.indexOf(x) === -1)
+      // the home page was loaded with picks
+      if (ids.length) {
+        fetch(`/api/find?ids=${this.props.location.query.picks}`)
+        .then(response => response.json())
+        .then(json => {
+          this.props.addPodcasts(json.items)
+        })
+      }
+    }
+  }
+
+  /* Used to make a permalink to this set of picks */
+  _updateBrowserHistory(ids) {
+    if (ids.length) {
+      browserHistory.push(`/?picks=${ids}`)
+    } else {
+      browserHistory.push(`/`)
+    }
+
+  }
+
+  selectPodcast(podcast) {
+    this.props.addPodcasts([podcast])
+    let ids = this.props.podcasts.map(p => p.id)
+    this._updateBrowserHistory(ids)
+  }
+
+  unselectPodcast(podcast) {
+    this.props.removePodcast(podcast)
+    let ids = this.props.podcasts.map(p => p.id)
+    ids = ids.filter(id => id !== podcast.id)
+    this._updateBrowserHistory(ids)
+  }
+
+  render() {
+    updateDocumentTitle()  // default
+
+    return (
+      <div className="ui text container">
+        <h1>How Much Time Do <i>Your</i> Podcasts Take To Listen To?</h1>
+        <MainSearch
+          selectPodcast={(podcast) => this.selectPodcast(podcast)}
+          />
+        <Podcasts
+          podcasts={this.props.podcasts}
+          removePodcast={(podcast) => this.unselectPodcast(podcast)}
+          removeAllPodcasts={this.props.removeAllPodcasts}
+          />
+      </div>
+    )
+  }
+
 }
 
 const Podcasts = ({podcasts, removePodcast, removeAllPodcasts}) => {
@@ -73,15 +133,17 @@ const Podcast = ({podcast, removePodcast}) => {
           >Remove</button>
       </div>
       <div className="img">
-        <a title={podcast.name}
-          href={'/podcasts/' + podcast.id + '/' + podcast.slug}
-          ><img src={podcast.image_url} alt="logo"/></a>
+        <Link title={podcast.name}
+          to={`/podcasts/${podcast.id}/${podcast.slug}`}>
+          <img src={podcast.image_url} alt="logo"/>
+        </Link>
       </div>
       <div className="meta">
         <h3>
-          <a title={podcast.name}
-            href={'/podcasts/' + podcast.id + '/' + podcast.slug}
-            >{podcast.name}</a>
+          <Link title={podcast.name}
+            to={`/podcasts/${podcast.id}/${podcast.slug}`}>
+            {podcast.name}
+          </Link>
         </h3>
         <p>
           { text }
@@ -169,7 +231,8 @@ class MainSearch extends React.Component {
       templateSelection: this.formatPodcastSelection,
     })
     .on("select2:select", (event) => {
-      this.props.addPodcast(event.params.data);
+      // browserHistory.push(`/?picks=${event.params.data.id}`)
+      this.props.selectPodcast(event.params.data);
     });
   }
 
@@ -184,7 +247,12 @@ class MainSearch extends React.Component {
   }
 }
 
-export default connect(
-  state => ({ podcasts: state.select }),
-  { addPodcast, removePodcast, removeAllPodcasts }
-)(Home)
+function mapStateToProps(state) {
+  return { podcasts: state.home }
+}
+
+export default connect(mapStateToProps, {
+  addPodcasts,
+  removePodcast,
+  removeAllPodcasts,
+})(Home)
