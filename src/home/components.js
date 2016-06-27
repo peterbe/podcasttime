@@ -66,6 +66,11 @@ class Home extends Component {
     this._updateBrowserHistory(ids)
   }
 
+  unselectAll() {
+    this.props.removeAllPodcasts()
+    this._updateBrowserHistory([])
+  }
+
   render() {
     updateDocumentTitle()  // default
 
@@ -73,12 +78,12 @@ class Home extends Component {
       <div className="ui text container">
         <h1>How Much Time Do <i>Your</i> Podcasts Take To Listen To?</h1>
         <MainSearch
-          selectPodcast={(podcast) => this.selectPodcast(podcast)}
+          selectPodcast={podcast => this.selectPodcast(podcast)}
           />
         <Podcasts
           podcasts={this.props.podcasts}
-          removePodcast={(podcast) => this.unselectPodcast(podcast)}
-          removeAllPodcasts={this.props.removeAllPodcasts}
+          removePodcast={podcast => this.unselectPodcast(podcast)}
+          removeAllPodcasts={() => this.unselectAll()}
           />
       </div>
     )
